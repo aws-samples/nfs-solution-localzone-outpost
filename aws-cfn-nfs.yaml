@@ -1,0 +1,663 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Resilient NFS setup for LocalZone/Outpost
+
+Metadata:
+  "AWS::CloudFormation::Interface":
+    ParameterGroups:
+      - Label: High Available NFS setup
+        Parameters:
+          - NFSStackName
+      - Label: NFS EC2 Node Configuration
+        Parameters:
+          - NFSVolumeSize
+          - VolumeType
+          - NodeInstanceType
+          - NFSIPAddress
+          - VpcId
+          - SubnetId
+          - KeyName
+Parameters:          
+  KeyName:
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Description: The EC2 Key Pair to allow SSH access to the instances
+
+  NodeInstanceType:
+    Type: String
+    Default: c5.2xlarge
+    Description: EC2 instance type for the node instances (must be supported in the current AZ/LocalZone/Outpost)
+    AllowedValues:
+      - a1.medium
+      - a1.large
+      - a1.xlarge
+      - a1.2xlarge
+      - a1.4xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+      - c5.metal
+      - c5d.large
+      - c5d.xlarge
+      - c5d.2xlarge
+      - c5d.4xlarge
+      - c5d.9xlarge
+      - c5d.18xlarge
+      - c5n.large
+      - c5n.xlarge
+      - c5n.2xlarge
+      - c5n.4xlarge
+      - c5n.9xlarge
+      - c5n.18xlarge
+      - cc2.8xlarge
+      - cr1.8xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - f1.2xlarge
+      - f1.4xlarge
+      - f1.16xlarge
+      - g2.2xlarge
+      - g2.8xlarge
+      - g3s.xlarge
+      - g3.4xlarge
+      - g3.8xlarge
+      - g3.16xlarge
+      - h1.2xlarge
+      - h1.4xlarge
+      - h1.8xlarge
+      - h1.16xlarge
+      - hs1.8xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - i3.large
+      - i3.xlarge
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.16xlarge
+      - i3.metal
+      - i3en.large
+      - i3en.xlarge
+      - i3en.2xlarge
+      - i3en.3xlarge
+      - i3en.6xlarge
+      - i3en.12xlarge
+      - i3en.24xlarge
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5.metal
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5ad.large
+      - m5ad.xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.12xlarge
+      - m5ad.24xlarge
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5d.metal
+      - m5dn.large
+      - m5dn.xlarge
+      - m5dn.2xlarge
+      - m5dn.4xlarge
+      - m5dn.8xlarge
+      - m5dn.12xlarge
+      - m5dn.16xlarge
+      - m5dn.24xlarge
+      - m5n.large
+      - m5n.xlarge
+      - m5n.2xlarge
+      - m5n.4xlarge
+      - m5n.8xlarge
+      - m5n.12xlarge
+      - m5n.16xlarge
+      - m5n.24xlarge
+      - p2.xlarge
+      - p2.8xlarge
+      - p2.16xlarge
+      - p3.2xlarge
+      - p3.8xlarge
+      - p3.16xlarge
+      - p3dn.24xlarge
+      - g4dn.xlarge
+      - g4dn.2xlarge
+      - g4dn.4xlarge
+      - g4dn.8xlarge
+      - g4dn.12xlarge
+      - g4dn.16xlarge
+      - g4dn.metal
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - r5.large
+      - r5.xlarge
+      - r5.2xlarge
+      - r5.4xlarge
+      - r5.8xlarge
+      - r5.12xlarge
+      - r5.16xlarge
+      - r5.24xlarge
+      - r5.metal
+      - r5a.large
+      - r5a.xlarge
+      - r5a.2xlarge
+      - r5a.4xlarge
+      - r5a.8xlarge
+      - r5a.12xlarge
+      - r5a.16xlarge
+      - r5a.24xlarge
+      - r5ad.large
+      - r5ad.xlarge
+      - r5ad.2xlarge
+      - r5ad.4xlarge
+      - r5ad.12xlarge
+      - r5ad.24xlarge
+      - r5d.large
+      - r5d.xlarge
+      - r5d.2xlarge
+      - r5d.4xlarge
+      - r5d.8xlarge
+      - r5d.12xlarge
+      - r5d.16xlarge
+      - r5d.24xlarge
+      - r5d.metal
+      - r5dn.large
+      - r5dn.xlarge
+      - r5dn.2xlarge
+      - r5dn.4xlarge
+      - r5dn.8xlarge
+      - r5dn.12xlarge
+      - r5dn.16xlarge
+      - r5dn.24xlarge
+      - r5n.large
+      - r5n.xlarge
+      - r5n.2xlarge
+      - r5n.4xlarge
+      - r5n.8xlarge
+      - r5n.12xlarge
+      - r5n.16xlarge
+      - r5n.24xlarge
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.nano
+      - t3a.micro
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - t3a.2xlarge
+      - u-6tb1.metal
+      - u-9tb1.metal
+      - u-12tb1.metal
+      - x1.16xlarge
+      - x1.32xlarge
+      - x1e.xlarge
+      - x1e.2xlarge
+      - x1e.4xlarge
+      - x1e.8xlarge
+      - x1e.16xlarge
+      - x1e.32xlarge
+      - z1d.large
+      - z1d.xlarge
+      - z1d.2xlarge
+      - z1d.3xlarge
+      - z1d.6xlarge
+      - z1d.12xlarge
+      - z1d.metal
+
+  NFSIPAddress: 
+    Type: String
+    Description: "Static IP address of the NFS server"
+
+  VolumeType: 
+    Type: String
+    Default: "gp2"
+    AllowedValues:
+      - "gp2"
+      - "gp3"       
+
+  NFSVolumeSize:
+    Type: Number
+    Default: 300
+    Description: NFS volume size (GB)
+
+  SubnetId:
+    Type: "List<AWS::EC2::Subnet::Id>"
+    Description: The subnets where NFS Node can be created.
+
+  VpcId:
+    Type: "AWS::EC2::VPC::Id"
+    Description: The VPC of the worker instances
+  NodeImageIdSSMParam:
+    Type : "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+   
+Mappings:
+  PartitionMap:
+    aws:
+      EC2ServicePrincipal: "ec2.amazonaws.com"
+    aws-us-gov:
+      EC2ServicePrincipal: "ec2.amazonaws.com"
+    aws-cn:
+      EC2ServicePrincipal: "ec2.amazonaws.com.cn"
+    aws-iso:
+      EC2ServicePrincipal: "ec2.c2s.ic.gov"
+    aws-iso-b:
+      EC2ServicePrincipal: "ec2.sc2s.sgov.gov"
+Resources:
+  NodeInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonEC2FullAccess
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonSSMManagedInstanceCore
+  NodeInstancePolicy:
+    Type: "AWS::IAM::Policy"
+    DependsOn: NodeInstanceRole
+    Properties:
+      PolicyName: NodeInstancePolicy
+      Roles: [
+          !Ref NodeInstanceRole
+        ]
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - kms:Decrypt
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - kms:GenerateDataKey
+              - logs:PutLogEvents
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Effect: Allow 
+            Resource: "*"
+          - Action: ec2:AttachVolume
+            Effect: Allow
+            Resource: "*"
+
+  NodeInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: /
+      Roles:
+        - !Ref NodeInstanceRole
+
+  NodeSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Security group for NFS node
+      VpcId: !Ref VpcId
+
+  NodeSecurityGroupIngress:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    DependsOn: NodeSecurityGroup
+    Properties:
+      Description: Allow node to communicate with each other
+      FromPort: 0
+      GroupId: !Ref NodeSecurityGroup
+      IpProtocol: "-1"
+      SourceSecurityGroupId: !Ref NodeSecurityGroup
+      ToPort: 65535
+
+  NodeSecurityGroupIngressVPCCidr:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    DependsOn: NodeSecurityGroup
+    Properties:
+      Description: Add VPC CIDR for NFS
+      FromPort: 2049
+      GroupId: !Ref NodeSecurityGroup
+      IpProtocol: "6"
+      CidrIp: !GetAtt getVPCDetails.vpcCidr
+      ToPort: 2049
+
+  RoleLambdaGetVPCDetails:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+  PolicyLambdaGetVPCDetails:
+    Type: "AWS::IAM::Policy"
+    DependsOn: RoleLambdaGetVPCDetails
+    Properties:
+      PolicyName: PolicyRoleLambdaGetVPCDetails
+      Roles: [
+          !Ref RoleLambdaGetVPCDetails
+        ]
+      PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: [
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+              ]
+              Resource: "*"
+            - Effect: Allow
+              Action: [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ]
+              Resource: "arn:aws:logs:*:*:*"
+            - Effect: Allow
+              Action: "logs:CreateLogGroup"
+              Resource: "arn:aws:logs:*:*:*"
+
+  NfsServerDataVolume:
+    Type: AWS::EC2::Volume
+    DependsOn: getVPCDetails
+    Properties:
+      AvailabilityZone: !GetAtt getVPCDetails.az
+      Encrypted: true
+      MultiAttachEnabled: false
+      Size: !Ref NFSVolumeSize
+      VolumeType: !Ref VolumeType
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+
+  getVPCDetails:
+    Type: Custom::getVPCDetails
+    Properties:
+      ServiceToken: !GetAtt LambdaGetVPCDetails.Arn 
+      VpcId: !Ref VpcId 
+      SubnetId: !Ref SubnetId
+
+  LambdaGetVPCDetails:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Description: Look up vpc CIDR,AZ details from vpc & subnet
+      Handler: index.handler
+      MemorySize: 128
+      Role: !GetAtt RoleLambdaGetVPCDetails.Arn
+      Runtime: "python3.8"
+      Timeout: 30
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import cfnresponse
+          import logging
+
+          def handler(event, context):
+            logger = logging.getLogger()
+            logger.setLevel(logging.INFO)
+            
+            # initialize our responses, assume failure by default
+            
+            response_data = {}
+            response_status = cfnresponse.FAILED
+            
+            logger.info('Received event: {}'.format(json.dumps(event)))
+            
+            if event['RequestType'] == 'Delete':
+              response_status = cfnresponse.SUCCESS
+              cfnresponse.send(event, context, response_status, response_data)
+            
+            try:
+              ec2=boto3.client('ec2')
+            except Exception as e:
+              logger.info('boto3.client failure: {}'.format(e))
+              cfnresponse.send(event, context, response_status, response_data)
+            
+            VpcId = event['ResourceProperties']['VpcId']
+            SubnetId = event['ResourceProperties']['SubnetId']
+
+            try:
+              vpc = ec2.describe_vpcs( VpcIds=[VpcId] )
+            except Exception as e:
+              logger.info('ec2.describe_vpcs failure: {}'.format(e))
+              cfnresponse.send(event, context, response_status, response_data)
+            CidrBlock = vpc['Vpcs'][0]['CidrBlock']
+            logger.info('CidrBlock {}'.format(CidrBlock))
+            try:
+              subnets = ec2.describe_subnets( SubnetIds=SubnetId)
+            except Exception as e:
+              logger.info('ec2.describe_subnets failure: {}'.format(e))
+              cfnresponse.send(event, context, response_status, response_data)
+            az = subnets['Subnets'][0]['AvailabilityZone']
+            logger.info('AvailabilityZone {}'.format(az))
+            response_data['az'] = az
+            response_data['vpcCidr'] = CidrBlock            
+            response_status = cfnresponse.SUCCESS
+            cfnresponse.send(event, context, response_status, response_data) 
+
+  NodeLaunchTemplate:
+    Type: "AWS::EC2::LaunchTemplate"
+    DependsOn:
+    - NodeSecurityGroup    
+    - getVPCDetails
+    Properties:
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              DeleteOnTermination: true
+              VolumeSize: 80
+              VolumeType: !Ref VolumeType
+        IamInstanceProfile:
+          Arn: !GetAtt NodeInstanceProfile.Arn
+        ImageId: !Ref NodeImageIdSSMParam
+        # ImageId: !If
+        #   - HasNodeImageId
+        #   - !Ref NodeImageId
+        #   - !Ref NodeImageIdSSMParam
+        InstanceType: !Ref NodeInstanceType
+        KeyName: !Ref KeyName
+#        SecurityGroupIds:
+#        - !Ref NodeSecurityGroup
+        UserData: !Base64
+          Fn::Sub:
+            - |-
+                #!/usr/bin/env bash
+                target_device="/dev/xvdb"
+                ip_address="${NFSIPAddress}"
+                volume_id="${NfsServerDataVolume}"
+                mount_path="/data"
+                set -o xtrace
+                echo "NFS IpAddress: $ip_address"
+                echo "NFS VolumeId: $volume_id"
+                echo "NFS MountPath: $mount_path"
+                echo "NFS target_device: $target_device"
+                echo "vpc cidr: ${vpcCidr}"
+
+                TOKEN=$(curl -SsfX PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+                INSTANCE_ID=$(curl -SsfH "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+                REGION=$(curl -SsfH "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
+                PRIVATE_IP=$(curl -SsfH "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+                ENI_ID=$(aws --region $REGION ec2 describe-network-interfaces --filters Name=addresses.private-ip-address,Values=$PRIVATE_IP --query 'NetworkInterfaces[0].NetworkInterfaceId' | tr -d \")
+
+
+                ## Setup NFS
+                yum install nfs-utils -y 
+
+                ## Detach EBS Volume
+                EBS_CONDITION=$(aws --region $REGION ec2 describe-volumes --volume-id $volume_id --query 'Volumes[0].State' | tr -d \")
+
+                if [ "$EBS_CONDITION" = "in-use" ]; then
+                    aws --region $REGION ec2 detach-volume --volume-id $volume_id
+                    sleep 60
+                fi
+
+                ## Attach EBS volume
+                aws --region $REGION ec2 attach-volume --volume-id $volume_id --instance-id $INSTANCE_ID --device $target_device
+
+                ## assign secondary IP
+                aws --region $REGION ec2 assign-private-ip-addresses --allow-reassignment --network-interface-id $ENI_ID --private-ip-addresses $ip_address
+                
+                ## add the IP address to operating system interface eth0
+                echo "ip a add $ip_address dev eth0" >> /etc/rc.d/rc.local
+                chmod a+x /etc/rc.d/rc.local
+                systemctl enable rc-local
+                systemctl start rc-local
+                #wait for the NFS volume attachment
+                while ! test -e $target_device; do sleep 1; done
+
+                sudo mkdir -p $mount_path
+                sudo chmod -R 755 $mount_path
+                sudo chown ec2-user:ec2-user $mount_path
+                sudo mkfs -t xfs $target_device
+                sudo mount $target_device $mount_path/
+
+                cat <<EOF >> /etc/exports
+                $mount_path    ${vpcCidr}(rw,sync,no_root_squash,no_all_squash)
+                EOF
+
+                sudo service nfs-server restart
+            - vpcCidr : !GetAtt getVPCDetails.vpcCidr
+        MetadataOptions:
+          HttpPutResponseHopLimit : 2
+          HttpEndpoint: enabled
+          HttpTokens: required
+        NetworkInterfaces:
+          - DeviceIndex: 0
+            SubnetId: !Select [ "0", !Ref SubnetId ]
+            DeleteOnTermination: "true"
+            Groups:
+              - !Ref NodeSecurityGroup
+
+  NodeGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      DesiredCapacity: 1
+      LaunchTemplate:
+        LaunchTemplateId: !Ref NodeLaunchTemplate
+        Version: !GetAtt NodeLaunchTemplate.LatestVersionNumber
+      MaxSize: 2
+      MinSize: 1
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: true
+          Value: !Sub NFS-NG-${AWS::StackName}
+      VPCZoneIdentifier: !Ref SubnetId
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MaxBatchSize: 1
+        MinInstancesInService: 1
+        SuspendProcesses:
+          - HealthCheck
+          - ReplaceUnhealthy
+          - AZRebalance
+          - AlarmNotification
+          - ScheduledActions
+        PauseTime: PT5M
+      AutoScalingScheduledAction:
+        IgnoreUnmodifiedGroupSizeProperties: true
+
+  WarmPool: 
+    Type: AWS::AutoScaling::WarmPool
+    Properties:
+      AutoScalingGroupName: !Ref NodeGroup
+      MaxGroupPreparedCapacity: 1
+      MinSize: 1
+      PoolState: Stopped
+Outputs:
+  NodeInstanceRole:
+    Description: The node instance role
+    Value: !GetAtt NodeInstanceRole.Arn
+
+  NodeSecurityGroup:
+    Description: The security group for the NFS server
+    Value: !GetAtt NodeSecurityGroup.GroupId
+  NfsServerDataVolume:
+    Description: The NFS volume Name for the NFS server
+    Value: !Ref NfsServerDataVolume    
+
