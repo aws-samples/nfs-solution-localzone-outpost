@@ -8,7 +8,7 @@
 Amazon EKS utilizes EBS to support (RWO) ReadWriteOnce storage and EFS to support ReadWriteMany (RWX) storage using CSI drivers for their workloads in AWS Regions. 
 Similarly for EC2 workloads where a Network Access Storage (Mountable File based storage) is needed, EFS is utilized in region.
 
-LocalZones and outposts have been an essential part of the workloads/solutions which run close to the Edge and customer network. Since localZones and Outposts are smaller, a few services like EFS (Elastic File System) isn't available in LocalZones/Outposts. Sometimes its possible to acccess EFS from the Region over the service link, however the latency, could be a factor for I/O heavy workloads to send and receive the data over network which could have been managed locally.There is a need to offer a resilient, reliable, local Storage which can be  utilized by the EKS workloads as ReadWriteMany Storage, and a Network File system storage for EC2 workloads in the LocalZone.
+LocalZones and outposts have been an essential part of the workloads/solutions which run close to the Edge and customer network. A few services like EFS (Elastic File System) isn't available in LocalZones/Outposts. Sometimes its possible to acccess EFS from the Region over the service link, however the latency, could be a factor for I/O heavy workloads to send and receive the data over network which could have been managed locally.There is a need to offer a resilient, reliable, local Storage which can be  utilized by the EKS workloads as ReadWriteMany Storage, and a Network File system storage for EC2 workloads in the LocalZone.
 
 ###  Preparation 
 
@@ -175,8 +175,7 @@ mkdir -p /var/backups
 sudo mount -t nfs 10.0.0.200:/data /var/backups
 ```
 
-Run the below script which writes the data on NFS and while the script is running, delete the EC2 node running as NFS server. you would notice that AustoScalingGroup
-launches a new server with same HA NFSIPAddress (in this ex: 10.0.0.200) within 1-1.5 minutes
+Run the below script which writes the data on NFS. While the script is running, delete the EC2 node running as NFS server to mimic the hardware failure, causing server unplanned failure. You would notice that AustoScalingGroup launches a new server with same HA NFSIPAddress (in this ex: 10.0.0.200) within 1-1.5 minutes
 
 ```
 while true ; do echo `date` >>/var/backups/log.txt ; tail -1 /var/backups/log.txt ; sleep 1; done
@@ -189,9 +188,9 @@ Sun May 22 20:15:22 UTC 2022
 Sun May 22 20:15:23 UTC 2022
 Sun May 22 20:15:24 UTC 2022
 Sun May 22 20:15:26 UTC 2022
-**Sun May 22 20:15:27 UTC 2022
-Sun May 22 20:15:28 UTC 2022**
-Sun May 22 20:16:40 UTC 2022
+Sun May 22 20:15:27 UTC 2022
+Sun May 22 20:15:28 UTC 2022 <- Old server terminated/replaced
+Sun May 22 20:16:40 UTC 2022 <- New Server in service
 Sun May 22 20:16:41 UTC 2022
 Sun May 22 20:16:42 UTC 2022
 Sun May 22 20:16:43 UTC 2022
