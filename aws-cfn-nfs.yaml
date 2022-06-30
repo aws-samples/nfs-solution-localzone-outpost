@@ -574,7 +574,7 @@ Resources:
 
                 if [ "$EBS_CONDITION" = "in-use" ]; then
                     aws --region $REGION ec2 detach-volume --volume-id $volume_id
-                    sleep 60
+                    sleep 30
                 fi
 
                 ## Attach EBS volume
@@ -642,13 +642,6 @@ Resources:
       AutoScalingScheduledAction:
         IgnoreUnmodifiedGroupSizeProperties: true
 
-  WarmPool: 
-    Type: AWS::AutoScaling::WarmPool
-    Properties:
-      AutoScalingGroupName: !Ref NodeGroup
-      MaxGroupPreparedCapacity: 1
-      MinSize: 1
-      PoolState: Stopped
 Outputs:
   NodeInstanceRole:
     Description: The node instance role
