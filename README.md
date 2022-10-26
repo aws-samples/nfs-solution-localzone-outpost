@@ -10,8 +10,11 @@ Similarly for EC2 workloads where a Network Access Storage (Mountable File based
 
 LocalZones and outposts have been an essential part of the workloads/solutions which run close to the Edge and customer network. Since localZones and Outposts are smaller, a few services like EFS (Elastic File System) isn't available in LocalZones/Outposts. Sometimes its possible to acccess EFS from the Region over the service link, however the latency, could be a factor for I/O heavy workloads to send and receive the data over network which could have been managed locally.There is a need to offer a resilient, reliable, local Storage which can be  utilized by the EKS workloads as ReadWriteMany Storage, and a Network File system storage for EC2 workloads in the LocalZone.
 
-###  Preparation 
+### Architecture
 
+![](nfs.jpg)
+
+###  Preparation 
 
 Clone this repo:
 
