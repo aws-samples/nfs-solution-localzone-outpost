@@ -26,9 +26,9 @@ https://github.com/aws-samples/nfs-solution-localzone-outpost
 
 This solution offers a NFS (Network FIle System) based storage system which has following main components:
 
-1. A High Available static secondary IP address (virtual/floating ip), which ensures that clinets of this server always have uninterrupted access to the FileServer with same IP address.
+1. A High Available static secondary IP address (virtual/floating ip), which ensures that clients of this server always have uninterrupted access to the FileServer with same IP address.
 2. A secondary EBS volume (acting as File storage directory). NFS clients mount this directory and store their data. This volume is retained even after the stack is deleted, so if there is a need, this volume can be reused. 
-3. An AutoScalingGroup, maintaining the Reliability & resilliancy for the EC2 node acting as the Network File System. Autoscaling group is launched wth 1 node. 
+3. An AutoScalingGroup, maintaining the Reliability & resilliency for the EC2 node acting as the Network File System. Autoscaling group is launched wth 1 node. 
 4. For Kubernetes workloads, nfs-provisioner driver, can be used to provide the ReadWriteMany StorageClass using the HA static IP address of the NFS server.
 
 
