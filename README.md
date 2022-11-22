@@ -102,7 +102,7 @@ overlay            24G   14G   11G  55% /var/lib/docker/overlay2/671875ffbbcc032
 10.0.0.200:/data  300G  338M  300G   1% /var/backups
 ```
 
-### Step 3: Insall NFS external privisoner for EKS workloads
+### Step 4: Insall NFS external privisoner for EKS workloads
 
 Refer the steps at https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner or the below steps. Please replace x.x.x.x with your NFSIPAddress
 (ex: 10.0.0.200)  and nfs.path as /data. This creates a storageclass as nfs-client
@@ -138,8 +138,6 @@ NAME            PROVISIONER                                     RECLAIMPOLICY   
 gp2 (default)   kubernetes.io/aws-ebs                           Delete          WaitForFirstConsumer   false                  386d
 nfs-client      cluster.local/nfs-subdir-external-provisioner   Delete          Immediate              true                   2m10s
 ```
-
-Note: of the 
 
 ### Step 5: Verify the Dynamic provision on NFS
 
